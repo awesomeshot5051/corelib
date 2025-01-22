@@ -1,9 +1,6 @@
-#before_install:
-#  - sdk install java 21.0.2-open
-#  - sdk use java 21.0.2-open
-
-build:
-  script:
-    - ./gradlew clean build
 jdk:
   - openjdk21
+before_install:
+  - sdk install maven
+install:
+  - mvn clean install -Dmaven.javadoc.skip=true -DskipTests
