@@ -3,4 +3,4 @@ jdk:
 
 build:
   script:
-    - JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew clean build
+    - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./gradlew clean build
