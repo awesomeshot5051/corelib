@@ -69,11 +69,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
-//tasks.register('apiJar', Jar) {
-//    archiveClassifier = 'api'
-//    from sourceSets.main.output
-//    exclude 'de/maxhenkel/corelib/dev'
-//}
 tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
@@ -92,16 +87,13 @@ tasks.register("generateModMetadata", ProcessResources) {
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+neoForge.ideSyncTask generateModMetadata as Task
 tasks.register('javadocJar', Jar) {
     dependsOn javadoc
     archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-tasks.matching(it -> it.name.startsWith("publish")).configureEach {
-    it.dependsOn shadowJar
-}
 
 javadoc {
     failOnError = false
@@ -109,24 +101,7 @@ javadoc {
 
 artifacts {
     archives jar
-//    archives apiJar
     archives javadocJar
     archives sourcesJar
 }
-
-//publishing {
-//    publications {
-//        mavenJava(MavenPublication) {
-//            artifact jar
-//            artifact apiJar
-//            artifact javadocJar
-//            artifact sourcesJar
-//        }
-//    }
-//    repositories {
-//        maven {
-//            name = 'henkelmax.public'
-//            url = 'https://maven.maxhenkel.de/repository/public'
-//        }
-//    }
 

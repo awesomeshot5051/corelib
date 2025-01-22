@@ -1,13 +1,9 @@
 modLoader = "javafml"
 loaderVersion = "*"
 license = "All rights reserved"
-#issueTrackerURL = "https://github.com/henkelmax/easy-villagers/issues"
 [[mods]]
 modId = "corelib"
-#version = "${mod_version}"
 displayName = "Mob Farms"
-#updateJSONURL = "https://update.maxhenkel.de/neoforge/corelib"
-#displayURL = "https://www.curseforge.com/minecraft/mc-mods/easy-villagers"
 logoFile = "../assets/corelib/textures/gui/icons/icon.png"
 authors = "awesomeshot5051"
 description = '''Mod Farms'''
