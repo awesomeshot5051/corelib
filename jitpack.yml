@@ -1,6 +1,7 @@
-jdk:
-  - openjdk21
+before_install:
+  - sdk install java 21.0.2-open
+  - sdk use java 21.0.2-open
 
 build:
   script:
-    - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./gradlew clean build
+    - ./gradlew clean build
