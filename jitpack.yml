@@ -10,6 +10,3 @@ before_install:
   - export PATH=$PATH:$GRADLE_HOME/bin
   - gradle -v
 
-install:
-  - gradle clean build -x test
-
