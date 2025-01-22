@@ -1,15 +1,8 @@
 plugins {
-//    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
-//    id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
     id 'com.github.johnrengelman.shadow' version "${shadow_version}"
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.74'
-    // Plugin to use the settings.xml for authentication
-//    id 'net.linguica.maven-settings' version "${maven_settings_version}"
 }
-
-//apply plugin: 'maven-publish'
-//apply from: "https://raw.githubusercontent.com/henkelmax/mod-gradle-scripts/${mod_gradle_script_version}/mod.gradle"
 
 java{
     withSourcesJar()
