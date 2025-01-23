@@ -110,8 +110,13 @@ tasks.register('javadocJar', Jar) {
 
 publishing {
     publications {
-        register('mavenJava', MavenPublication) {
+        library(MavenPublication) {
             from components.java
+        }
+    }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir("publishing-repository")
         }
     }
 }
@@ -125,3 +130,20 @@ artifacts {
     archives sourcesJar
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/awesomeshot5051/corelib")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
