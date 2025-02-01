@@ -16,6 +16,7 @@ java {
     }
     withSourcesJar()
 }
+
 tasks.named("githubRelease") {
     dependsOn tasks.named("generateChangelog")
     repository = "awesomeshot5051/corelib"

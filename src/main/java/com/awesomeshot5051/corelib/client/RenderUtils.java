@@ -2,6 +2,8 @@ package com.awesomeshot5051.corelib.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.*;
+import net.minecraft.core.*;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector3f;
 
@@ -64,5 +66,15 @@ public class RenderUtils {
                 .setLight(light)
                 .setNormal(entry, norX, norY, norZ);
     }
+    public static void renderMob(PoseStack matrixStack, Direction direction) {
+            matrixStack.pushPose();
+            switch (direction) {
+                case NORTH, WEST -> matrixStack.translate(.5D, 0D, .5D);
+                case EAST -> matrixStack.translate(.5D, 0D, 0.5D);
+                case SOUTH -> matrixStack.translate(0.5D, 0D, 0.5D);
+            }
+            matrixStack.mulPose(Axis.YP.rotationDegrees(-direction.toYRot()));
+            matrixStack.scale(0.4F, 0.4F, 0.4F);
+        }
 
 }
