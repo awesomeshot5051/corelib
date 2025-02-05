@@ -149,4 +149,71 @@ public class SyncableTileentity extends BlockEntity {
     private static boolean isValidAxe(String itemId) {
         return itemId.contains("minecraft:wooden_axe") || itemId.contains("minecraft:stone_axe") || itemId.contains("minecraft:iron_axe") || itemId.contains("minecraft:diamond_axe") || itemId.contains("minecraft:golden_axe") || itemId.contains("minecraft:netherite_axe");
     }
+
+    public static Optional<ItemStack> loadPickType(CompoundTag compound, HolderLookup.Provider provider) {
+        if (compound.contains("PickType")) {
+            Tag pickTypeTag = compound.get("PickType");
+            if (pickTypeTag != null && isValidPickaxe(pickTypeTag.toString()) || isValidShovel(Objects.requireNonNull(pickTypeTag).toString())) {
+                return ItemStack.parse(provider, pickTypeTag);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Map<ResourceKey<Enchantment>, Boolean> loadPickaxeEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
+        ListTag enchantmentsList = compound.getList("PickaxeEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getPickaxeEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); i++) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+
+
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+
+
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            PickaxeEnchantments.togglePickaxeEnchantment(enchantments, enchantmentKey, true);
+        }
+        return enchantments;
+    }
+
+    public static Map<ResourceKey<Enchantment>, Boolean> loadShovelEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
+        ListTag enchantmentsList = compound.getList("ShovelEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getShovelEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); i++) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+
+
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+
+
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            ShovelEnchantments.toggleShovelEnchantment(enchantments, enchantmentKey, true);
+        }
+        return enchantments;
+    }
+
+
+    public static Optional<ItemStack> loadShovelType(CompoundTag compound, HolderLookup.Provider provider) {
+        if (compound.contains("ShovelType")) {
+            Tag shovelTypeTag = compound.get("ShovelType");
+            if (shovelTypeTag != null && isValidShovel(shovelTypeTag.toString()) || isValidShovel(Objects.requireNonNull(shovelTypeTag).toString())) {
+                return ItemStack.parse(provider, shovelTypeTag);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isValidShovel(String itemId) {
+        return itemId.contains("minecraft:wooden_shovel") ||
+                itemId.contains("minecraft:stone_shovel") ||
+                itemId.contains("minecraft:iron_shovel") ||
+                itemId.contains("minecraft:diamond_shovel") ||
+                itemId.contains("minecraft:golden_shovel") ||
+                itemId.contains("minecraft:netherite_shovel");
+    }
+
 }
