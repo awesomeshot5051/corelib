@@ -1,8 +1,10 @@
 package com.awesomeshot5051.corelib.datacomponents;
 
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Upgrades {
     public static Map<ItemStack, Boolean> initializeUpgrades(List<ItemStack> upgrades) {
@@ -16,4 +18,33 @@ public class Upgrades {
         return upgradesMap;
     }
 
+    public static boolean getUpgradeStatus(Map<ItemStack,Boolean> upgradesMap, ItemStack upgrade) {
+        return upgradesMap.getOrDefault(upgrade, false);
+    }
+
+    public static void setUpgradeStatus(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade, boolean value) {
+        if (upgradesMap.containsKey(upgrade)) {
+            upgradesMap.put(upgrade, value);
+        } else {
+            throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
+        }
+    }
+
+    public static void toggleUpgrade(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade) {
+        if (upgradesMap.containsKey(upgrade)) {
+            upgradesMap.put(upgrade, !upgradesMap.get(upgrade));
+        } else {
+            throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
+        }
+    }
+
+    public static void toggleUpgrades(Map<ItemStack,Boolean> upgradesMap,Map<ItemStack, Boolean> upgradesToToggle) {
+        for (Map.Entry<ItemStack, Boolean> entry : upgradesToToggle.entrySet()) {
+            if (upgradesMap.containsKey(entry.getKey())) {
+                upgradesMap.put(entry.getKey(), entry.getValue());
+            } else {
+                throw new IllegalArgumentException("Invalid upgrade: " + entry.getKey());
+            }
+        }
+    }
 }
