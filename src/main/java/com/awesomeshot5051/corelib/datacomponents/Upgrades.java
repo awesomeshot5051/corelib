@@ -23,11 +23,13 @@ public class Upgrades {
     }
 
     public static void setUpgradeStatus(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade, boolean value) {
-        if (upgradesMap.containsKey(upgrade)) {
-            upgradesMap.put(upgrade, value);
-        } else {
-            throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
+        for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
+            if (ItemStack.isSameItem(entry.getKey(), upgrade)) {  // Compare only items, ignoring count and other properties
+                entry.setValue(value);
+                return;
+            }
         }
+        throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
     }
 
     public static void toggleUpgrade(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade) {
