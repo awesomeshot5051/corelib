@@ -20,7 +20,8 @@ public class SyncableTileentity extends BlockEntity {
     public SyncableTileentity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    public static Optional<ItemStack> loadSwordType(CompoundTag compound, HolderLookup.Provider provider){
+
+    public static Optional<ItemStack> loadSwordType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("SwordType")) {
             Tag swordTypeTag = compound.get("SwordType");
             if (swordTypeTag != null && isValidSword(swordTypeTag.toString())) {
@@ -38,6 +39,7 @@ public class SyncableTileentity extends BlockEntity {
                 itemId.contains("minecraft:golden_sword") ||
                 itemId.contains("minecraft:netherite_sword");
     }
+
     private static boolean isValidPickaxe(String itemId) {
         return itemId.contains("minecraft:wooden_pickaxe") ||
                 itemId.contains("minecraft:stone_pickaxe") ||
@@ -46,30 +48,7 @@ public class SyncableTileentity extends BlockEntity {
                 itemId.contains("minecraft:golden_pickaxe") ||
                 itemId.contains("minecraft:netherite_pickaxe");
     }
-    public void sync() {
-        if (level instanceof ServerLevel serverLevel) {
-            LevelChunk chunk = serverLevel.getChunkAt(getBlockPos());
-            if (chunk.getLevel().getChunkSource() instanceof ServerChunkCache chunkCache) {
-                chunkCache.chunkMap.getPlayers(chunk.getPos(), false).forEach(this::syncContents);
-            }
-        }
-    }
 
-    public void syncContents(ServerPlayer player) {
-        player.connection.send(getUpdatePacket());
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-        CompoundTag updateTag = new CompoundTag();
-        saveAdditional(updateTag, provider);
-        return updateTag;
-    }
     public static Optional<ItemStack> loadHoeType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("HoeType")) {
             Tag hoeTypeTag = compound.get("HoeType");
@@ -127,6 +106,7 @@ public class SyncableTileentity extends BlockEntity {
         }
         return Optional.empty();
     }
+
     public static Map<ResourceKey<Enchantment>, Boolean> loadSwordEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("SwordEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getSwordEnchantments();
@@ -140,7 +120,6 @@ public class SyncableTileentity extends BlockEntity {
         }
         return enchantments;
     }
-
 
     private static boolean isValidHoe(String itemId) {
         return itemId.contains("minecraft:wooden_hoe") || itemId.contains("minecraft:stone_hoe") || itemId.contains("minecraft:iron_hoe") || itemId.contains("minecraft:diamond_hoe") || itemId.contains("minecraft:golden_hoe") || itemId.contains("minecraft:netherite_hoe");
@@ -196,7 +175,6 @@ public class SyncableTileentity extends BlockEntity {
         return enchantments;
     }
 
-
     public static Optional<ItemStack> loadShovelType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("ShovelType")) {
             Tag shovelTypeTag = compound.get("ShovelType");
@@ -215,18 +193,44 @@ public class SyncableTileentity extends BlockEntity {
                 itemId.contains("minecraft:golden_shovel") ||
                 itemId.contains("minecraft:netherite_shovel");
     }
-    public static Map<ItemStack, Boolean> loadUpgrades(CompoundTag compound,HolderLookup.Provider provider, FarmTileentity farm) {
+
+    public static Map<ItemStack, Boolean> loadUpgrades(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag upgradesList = compound.getList("Upgrades", CompoundTag.TAG_COMPOUND);
         Map<ItemStack, Boolean> upgrades = farm.getUpgrades();
 
         for (int i = 0; i < upgradesList.size(); i++) {
             CompoundTag upgradeTag = upgradesList.getCompound(i);
-//            String upgradeId = upgradeTag.getString("id");
-            ItemStack upgrade = ItemStack.parseOptional(provider,upgradeTag);
-            Upgrades.toggleUpgrade(upgrades,upgrade);
+            CompoundTag upgradeId = upgradeTag.getCompound("id");
+            ItemStack upgrade = ItemStack.parseOptional(provider, upgradeId);
+            Upgrades.toggleUpgrade(upgrades, upgrade);
         }
 
         return upgrades;
+    }
+
+    public void sync() {
+        if (level instanceof ServerLevel serverLevel) {
+            LevelChunk chunk = serverLevel.getChunkAt(getBlockPos());
+            if (chunk.getLevel().getChunkSource() instanceof ServerChunkCache chunkCache) {
+                chunkCache.chunkMap.getPlayers(chunk.getPos(), false).forEach(this::syncContents);
+            }
+        }
+    }
+
+    public void syncContents(ServerPlayer player) {
+        player.connection.send(getUpdatePacket());
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        CompoundTag updateTag = new CompoundTag();
+        saveAdditional(updateTag, provider);
+        return updateTag;
     }
 
 }
