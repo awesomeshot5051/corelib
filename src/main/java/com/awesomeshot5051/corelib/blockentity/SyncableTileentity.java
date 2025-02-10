@@ -215,5 +215,18 @@ public class SyncableTileentity extends BlockEntity {
                 itemId.contains("minecraft:golden_shovel") ||
                 itemId.contains("minecraft:netherite_shovel");
     }
+    public static Map<ItemStack, Boolean> loadUpgrades(CompoundTag compound,HolderLookup.Provider provider, FarmTileentity farm) {
+        ListTag upgradesList = compound.getList("Upgrades", CompoundTag.TAG_COMPOUND);
+        Map<ItemStack, Boolean> upgrades = farm.getUpgrades();
+
+        for (int i = 0; i < upgradesList.size(); i++) {
+            CompoundTag upgradeTag = upgradesList.getCompound(i);
+//            String upgradeId = upgradeTag.getString("id");
+            ItemStack upgrade = ItemStack.parseOptional(provider,upgradeTag);
+            Upgrades.toggleUpgrade(upgrades,upgrade);
+        }
+
+        return upgrades;
+    }
 
 }

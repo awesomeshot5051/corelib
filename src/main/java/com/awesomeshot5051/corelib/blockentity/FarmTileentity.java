@@ -82,6 +82,10 @@ public class FarmTileentity extends FakeWorldTileentity {
         return CustomData.EMPTY;
     }
 
+    public Map<ItemStack,Boolean> getUpgrades(){
+        return new HashMap<>();
+    }
+
     public <T extends FarmTileentity> void setSwordEnchantmentStatus(T farm) {
         Map<ResourceKey<Enchantment>, Boolean> swordEnchantments = farm.getSwordEnchantments();
         ItemEnchantments enchantments = farm.getSwordType().getTagEnchantments();
