@@ -17,8 +17,8 @@ public class Upgrades {
 
         return upgradesMap;
     }
-    public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack,Boolean> upgradesMap, List<ItemStack> upgrades) {
-//        Map<ItemStack, Boolean> upgradesMap = new HashMap<>();
+    public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack,Boolean> defaultUpgradesMap, List<ItemStack> upgrades) {
+        Map<ItemStack, Boolean> upgradesMap = Map.copyOf(defaultUpgradesMap);
 
         // Loop through the list of upgrades and initialize the map with each item and its corresponding upgrade status.
         for (ItemStack upgrade : upgrades) {
