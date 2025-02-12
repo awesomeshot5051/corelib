@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Upgrades {
-    public static Map<ItemStack, Boolean> initializeUpgrades(List<ItemStack> upgrades) {
-        Map<ItemStack, Boolean> upgradesMap = new HashMap<>();
+    public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack,Boolean> upgradesMap, List<ItemStack> upgrades) {
+//        Map<ItemStack, Boolean> upgradesMap = new HashMap<>();
 
         // Loop through the list of upgrades and initialize the map with each item and its corresponding upgrade status.
         for (ItemStack upgrade : upgrades) {
