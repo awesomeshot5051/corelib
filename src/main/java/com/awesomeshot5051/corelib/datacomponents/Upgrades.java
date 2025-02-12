@@ -12,7 +12,7 @@ public class Upgrades {
 
         // Loop through the list of upgrades and initialize the map with each item and its corresponding upgrade status.
         for (ItemStack upgrade : upgrades) {
-            upgradesMap.put(upgrade, false);  // Assuming false means not activated
+            toggleUpgrade(upgradesMap,upgrade);  // Assuming false means not activated
         }
 
         return upgradesMap;
