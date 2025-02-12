@@ -7,6 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Upgrades {
+    public static Map<ItemStack, Boolean> createUpgradesMap(List<ItemStack> upgrades) {
+        Map<ItemStack, Boolean> upgradesMap = new HashMap<>();
+
+        // Loop through the list of upgrades and initialize the map with each item and its corresponding upgrade status.
+        for (ItemStack upgrade : upgrades) {
+            upgradesMap.put(upgrade, false);  // Assuming false means not activated
+        }
+
+        return upgradesMap;
+    }
     public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack,Boolean> upgradesMap, List<ItemStack> upgrades) {
 //        Map<ItemStack, Boolean> upgradesMap = new HashMap<>();
 
@@ -17,7 +27,6 @@ public class Upgrades {
 
         return upgradesMap;
     }
-
     public static boolean getUpgradeStatus(Map<ItemStack,Boolean> upgradesMap, ItemStack upgrade) {
         for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
             if (ItemStack.isSameItem(entry.getKey(), upgrade)) {  // Compare only items, ignoring count and other properties
