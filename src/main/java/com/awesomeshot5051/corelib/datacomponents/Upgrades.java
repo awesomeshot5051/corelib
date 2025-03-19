@@ -1,10 +1,12 @@
 package com.awesomeshot5051.corelib.datacomponents;
 
+import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.*;
 
 public class Upgrades {
     public static Map<ItemStack, Boolean> createUpgradesMap(List<ItemStack> upgrades) {
