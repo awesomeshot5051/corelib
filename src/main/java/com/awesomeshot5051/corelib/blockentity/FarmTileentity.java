@@ -13,11 +13,9 @@ import net.minecraft.world.level.block.state.*;
 import java.util.*;
 
 public class FarmTileentity extends FakeWorldTileentity {
-    protected ItemStack villager;
 
     public FarmTileentity(BlockEntityType<?> type, BlockState defaultState, BlockPos pos, BlockState state) {
         super(type, defaultState, pos, state);
-        villager = ItemStack.EMPTY;
     }
 
 
@@ -82,8 +80,12 @@ public class FarmTileentity extends FakeWorldTileentity {
         return CustomData.EMPTY;
     }
 
-    public Map<ItemStack,Boolean> getUpgrades(){
+    public Map<ItemStack, Boolean> getUpgrades() {
         return new HashMap<>();
+    }
+
+    public <T extends FarmTileentity> boolean checkPasses(T farm) {
+        return false;
     }
 
     public <T extends FarmTileentity> void setSwordEnchantmentStatus(T farm) {

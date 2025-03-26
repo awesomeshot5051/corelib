@@ -9,6 +9,12 @@ plugins {
     id("org.shipkit.shipkit-auto-version") version "2.1.0"
 }
 group = 'com.awesomeshot5051.corelib'
+def secretsFile = file("secrets/secrets.properties")
+if (secretsFile.exists()) {
+    def properties = new Properties()
+    properties.load(secretsFile.newDataInputStream())
+    properties.each { key, value -> project.ext.set(key, value) }
+}
 version = mod_version
 java {
     toolchain {

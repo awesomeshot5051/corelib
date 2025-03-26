@@ -16,6 +16,10 @@ public class FakeWorldTileentity extends SyncableTileentity {
         this.defaultState = defaultState;
     }
 
+    public FakeWorldTileentity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
+
     public void setFakeWorld(Level w) {
         level = w;
         fakeWorld = true;

@@ -10,6 +10,7 @@ import net.minecraft.resources.*;
 import net.minecraft.server.level.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.*;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.level.chunk.*;
@@ -21,6 +22,7 @@ public class SyncableTileentity extends BlockEntity {
         super(type, pos, state);
     }
 
+    // Load SwordType (doesn't need a FarmTileentity parameter)
     public static Optional<ItemStack> loadSwordType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("SwordType")) {
             Tag swordTypeTag = compound.get("SwordType");
@@ -59,16 +61,27 @@ public class SyncableTileentity extends BlockEntity {
         return Optional.empty();
     }
 
+    private static boolean isValidHoe(String itemId) {
+        return itemId.contains("minecraft:wooden_hoe") ||
+                itemId.contains("minecraft:stone_hoe") ||
+                itemId.contains("minecraft:iron_hoe") ||
+                itemId.contains("minecraft:diamond_hoe") ||
+                itemId.contains("minecraft:golden_hoe") ||
+                itemId.contains("minecraft:netherite_hoe");
+    }
+
+    // Original methods using FarmTileentity
+
     public static Map<ResourceKey<Enchantment>, Boolean> loadHoeEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("HoeEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getHoeEnchantments();
-        for (int i = 0; i < enchantmentsList.size(); i++) {
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
             CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
             String enchantmentId = enchantmentTag.getString("id");
             boolean enabled = enchantmentTag.getBoolean("enabled");
             ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
-            HoeEnchantments.toggleHoeEnchantment(enchantments, enchantmentKey, true);
+            HoeEnchantments.toggleHoeEnchantment(enchantments, enchantmentKey, enabled);
         }
         return enchantments;
     }
@@ -76,13 +89,13 @@ public class SyncableTileentity extends BlockEntity {
     public static Map<ResourceKey<Enchantment>, Boolean> loadAxeEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("AxeEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getAxeEnchantments();
-        for (int i = 0; i < enchantmentsList.size(); i++) {
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
             CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
             String enchantmentId = enchantmentTag.getString("id");
             boolean enabled = enchantmentTag.getBoolean("enabled");
             ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
-            AxeEnchantments.toggleAxeEnchantment(enchantments, enchantmentKey, true);
+            AxeEnchantments.toggleAxeEnchantment(enchantments, enchantmentKey, enabled);
         }
         return enchantments;
     }
@@ -107,32 +120,33 @@ public class SyncableTileentity extends BlockEntity {
         return Optional.empty();
     }
 
+    private static boolean isValidAxe(String itemId) {
+        return itemId.contains("minecraft:wooden_axe") ||
+                itemId.contains("minecraft:stone_axe") ||
+                itemId.contains("minecraft:iron_axe") ||
+                itemId.contains("minecraft:diamond_axe") ||
+                itemId.contains("minecraft:golden_axe") ||
+                itemId.contains("minecraft:netherite_axe");
+    }
+
     public static Map<ResourceKey<Enchantment>, Boolean> loadSwordEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("SwordEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getSwordEnchantments();
-        for (int i = 0; i < enchantmentsList.size(); i++) {
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
             CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
             String enchantmentId = enchantmentTag.getString("id");
             boolean enabled = enchantmentTag.getBoolean("enabled");
             ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
-            SwordEnchantments.toggleEnchantment(enchantments, enchantmentKey, true);
+            SwordEnchantments.toggleEnchantment(enchantments, enchantmentKey, enabled);
         }
         return enchantments;
-    }
-
-    private static boolean isValidHoe(String itemId) {
-        return itemId.contains("minecraft:wooden_hoe") || itemId.contains("minecraft:stone_hoe") || itemId.contains("minecraft:iron_hoe") || itemId.contains("minecraft:diamond_hoe") || itemId.contains("minecraft:golden_hoe") || itemId.contains("minecraft:netherite_hoe");
-    }
-
-    private static boolean isValidAxe(String itemId) {
-        return itemId.contains("minecraft:wooden_axe") || itemId.contains("minecraft:stone_axe") || itemId.contains("minecraft:iron_axe") || itemId.contains("minecraft:diamond_axe") || itemId.contains("minecraft:golden_axe") || itemId.contains("minecraft:netherite_axe");
     }
 
     public static Optional<ItemStack> loadPickType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("PickType")) {
             Tag pickTypeTag = compound.get("PickType");
-            if (pickTypeTag != null && isValidPickaxe(pickTypeTag.toString()) || isValidShovel(Objects.requireNonNull(pickTypeTag).toString())) {
+            if (pickTypeTag != null && (isValidPickaxe(pickTypeTag.toString()) || isValidShovel(pickTypeTag.toString()))) {
                 return ItemStack.parse(provider, pickTypeTag);
             }
         }
@@ -142,17 +156,13 @@ public class SyncableTileentity extends BlockEntity {
     public static Map<ResourceKey<Enchantment>, Boolean> loadPickaxeEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("PickaxeEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getPickaxeEnchantments();
-        for (int i = 0; i < enchantmentsList.size(); i++) {
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
             CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
-
-
             String enchantmentId = enchantmentTag.getString("id");
             boolean enabled = enchantmentTag.getBoolean("enabled");
-
-
             ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
-            PickaxeEnchantments.togglePickaxeEnchantment(enchantments, enchantmentKey, true);
+            PickaxeEnchantments.togglePickaxeEnchantment(enchantments, enchantmentKey, enabled);
         }
         return enchantments;
     }
@@ -160,17 +170,13 @@ public class SyncableTileentity extends BlockEntity {
     public static Map<ResourceKey<Enchantment>, Boolean> loadShovelEnchantments(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag enchantmentsList = compound.getList("ShovelEnchantments", CompoundTag.TAG_COMPOUND);
         Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getShovelEnchantments();
-        for (int i = 0; i < enchantmentsList.size(); i++) {
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
             CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
-
-
             String enchantmentId = enchantmentTag.getString("id");
             boolean enabled = enchantmentTag.getBoolean("enabled");
-
-
             ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
             ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
-            ShovelEnchantments.toggleShovelEnchantment(enchantments, enchantmentKey, true);
+            ShovelEnchantments.toggleShovelEnchantment(enchantments, enchantmentKey, enabled);
         }
         return enchantments;
     }
@@ -178,7 +184,7 @@ public class SyncableTileentity extends BlockEntity {
     public static Optional<ItemStack> loadShovelType(CompoundTag compound, HolderLookup.Provider provider) {
         if (compound.contains("ShovelType")) {
             Tag shovelTypeTag = compound.get("ShovelType");
-            if (shovelTypeTag != null && isValidShovel(shovelTypeTag.toString()) || isValidShovel(Objects.requireNonNull(shovelTypeTag).toString())) {
+            if (shovelTypeTag != null && (isValidShovel(shovelTypeTag.toString()) || isValidShovel(Objects.requireNonNull(shovelTypeTag).toString()))) {
                 return ItemStack.parse(provider, shovelTypeTag);
             }
         }
@@ -197,40 +203,123 @@ public class SyncableTileentity extends BlockEntity {
     public static Map<ItemStack, Boolean> loadUpgrades(CompoundTag compound, HolderLookup.Provider provider, FarmTileentity farm) {
         ListTag upgradesList = compound.getList("Upgrades", CompoundTag.TAG_COMPOUND);
         Map<ItemStack, Boolean> upgrades = farm.getUpgrades();
-
-        for (int i = 0; i < upgradesList.size(); i++) {
+        for (int i = 0; i < upgradesList.size(); ++i) {
             CompoundTag upgradeTag = upgradesList.getCompound(i);
             CompoundTag upgradeId = upgradeTag.getCompound("id");
             ItemStack upgrade = ItemStack.parseOptional(provider, upgradeId);
             Upgrades.toggleUpgrade(upgrades, upgrade);
         }
-
         return upgrades;
     }
 
+    // Duplicate methods for FluidFarmTileentity
+
+    public static <T extends FluidFarmTileentity> Map<ResourceKey<Enchantment>, Boolean> loadHoeEnchantments(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag enchantmentsList = compound.getList("HoeEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getHoeEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            HoeEnchantments.toggleHoeEnchantment(enchantments, enchantmentKey, enabled);
+        }
+        return enchantments;
+    }
+
+    public static <T extends FluidFarmTileentity> Map<ResourceKey<Enchantment>, Boolean> loadAxeEnchantments(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag enchantmentsList = compound.getList("AxeEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getAxeEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            AxeEnchantments.toggleAxeEnchantment(enchantments, enchantmentKey, enabled);
+        }
+        return enchantments;
+    }
+
+    public static <T extends FluidFarmTileentity> Map<ResourceKey<Enchantment>, Boolean> loadSwordEnchantments(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag enchantmentsList = compound.getList("SwordEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getSwordEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            SwordEnchantments.toggleEnchantment(enchantments, enchantmentKey, enabled);
+        }
+        return enchantments;
+    }
+
+    public static <T extends FluidFarmTileentity> Map<ResourceKey<Enchantment>, Boolean> loadPickaxeEnchantments(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag enchantmentsList = compound.getList("PickaxeEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getPickaxeEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            PickaxeEnchantments.togglePickaxeEnchantment(enchantments, enchantmentKey, enabled);
+        }
+        return enchantments;
+    }
+
+    public static <T extends FluidFarmTileentity> Map<ResourceKey<Enchantment>, Boolean> loadShovelEnchantments(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag enchantmentsList = compound.getList("ShovelEnchantments", CompoundTag.TAG_COMPOUND);
+        Map<ResourceKey<Enchantment>, Boolean> enchantments = farm.getShovelEnchantments();
+        for (int i = 0; i < enchantmentsList.size(); ++i) {
+            CompoundTag enchantmentTag = enchantmentsList.getCompound(i);
+            String enchantmentId = enchantmentTag.getString("id");
+            boolean enabled = enchantmentTag.getBoolean("enabled");
+            ResourceLocation enchantmentLocation = ResourceLocation.parse(enchantmentId);
+            ResourceKey<Enchantment> enchantmentKey = ResourceKey.create(Registries.ENCHANTMENT, enchantmentLocation);
+            ShovelEnchantments.toggleShovelEnchantment(enchantments, enchantmentKey, enabled);
+        }
+        return enchantments;
+    }
+
+    public static <T extends FluidFarmTileentity> Map<ItemStack, Boolean> loadUpgrades(CompoundTag compound, HolderLookup.Provider provider, T farm) {
+        ListTag upgradesList = compound.getList("Upgrades", CompoundTag.TAG_COMPOUND);
+        Map<ItemStack, Boolean> upgrades = farm.getUpgrades();
+        for (int i = 0; i < upgradesList.size(); ++i) {
+            CompoundTag upgradeTag = upgradesList.getCompound(i);
+            CompoundTag upgradeId = upgradeTag.getCompound("id");
+            Optional<ItemStack> upgradeOpt = Optional.of(ItemStack.parseOptional(provider, upgradeId));
+            upgradeOpt.ifPresent(upgrade -> Upgrades.toggleUpgrade(upgrades, upgrade));
+        }
+        return upgrades;
+    }
+
+    // End duplicate methods
+
     public void sync() {
-        if (level instanceof ServerLevel serverLevel) {
-            LevelChunk chunk = serverLevel.getChunkAt(getBlockPos());
-            if (chunk.getLevel().getChunkSource() instanceof ServerChunkCache chunkCache) {
-                chunkCache.chunkMap.getPlayers(chunk.getPos(), false).forEach(this::syncContents);
+        Level chunk = this.level;
+        if (chunk instanceof ServerLevel serverLevel) {
+            LevelChunk chunkObj = serverLevel.getChunkAt(this.getBlockPos());
+            ChunkSource var4 = chunkObj.getLevel().getChunkSource();
+            if (var4 instanceof ServerChunkCache chunkCache) {
+                chunkCache.chunkMap.getPlayers(chunkObj.getPos(), false).forEach(this::syncContents);
             }
         }
     }
 
     public void syncContents(ServerPlayer player) {
-        player.connection.send(getUpdatePacket());
+        player.connection.send(this.getUpdatePacket());
     }
 
-    @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag updateTag = new CompoundTag();
-        saveAdditional(updateTag, provider);
+        this.saveAdditional(updateTag, provider);
         return updateTag;
     }
-
 }

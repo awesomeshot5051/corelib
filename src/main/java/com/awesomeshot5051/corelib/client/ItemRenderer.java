@@ -22,7 +22,7 @@ public class ItemRenderer {
     }
 
     @net.neoforged.api.distmarker.OnlyIn(net.neoforged.api.distmarker.Dist.CLIENT)
-    protected com.awesomeshot5051.corelib.client.ItemRenderer.Renderer getRenderer() {
+    protected ItemRenderer.Renderer getRenderer() {
         return renderer;
     }
 
@@ -35,7 +35,7 @@ public class ItemRenderer {
 
         @Override
         public void renderByItem(ItemStack stack, ItemDisplayContext itemDisplayContext, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay) {
-            com.awesomeshot5051.corelib.client.ItemRenderer.this.renderByItem(stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay);
+            ItemRenderer.this.renderByItem(stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay);
         }
     }
 
