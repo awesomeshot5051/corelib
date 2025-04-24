@@ -1,12 +1,10 @@
 package com.awesomeshot5051.corelib.datacomponents;
 
-import net.minecraft.world.entity.player.*;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.*;
 
 public class Upgrades {
     public static Map<ItemStack, Boolean> createUpgradesMap(List<ItemStack> upgrades) {
@@ -19,16 +17,25 @@ public class Upgrades {
 
         return upgradesMap;
     }
-    public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack,Boolean> defaultUpgradesMap, List<ItemStack> upgrades) {
+
+    public static Map<ItemStack, Boolean> initializeUpgrades(Map<ItemStack, Boolean> defaultUpgradesMap, List<ItemStack> upgrades) {
         Map<ItemStack, Boolean> upgradesMap = new HashMap<>(defaultUpgradesMap);
         // Loop through the list of upgrades and initialize the map with each item and its corresponding upgrade status.
         for (ItemStack upgrade : upgrades) {
-            toggleUpgrade(upgradesMap,upgrade);  // Assuming false means not activated
+            toggleUpgrade(upgradesMap, upgrade);  // Assuming false means not activated
         }
 
         return upgradesMap;
     }
-    public static boolean getUpgradeStatus(Map<ItemStack,Boolean> upgradesMap, ItemStack upgrade) {
+
+    public static boolean getUpgradeStatus(Map<ItemStack, Boolean> upgradesMap, ItemStack upgrade) {
+        if (upgradesMap == null) {
+            try {
+                throw new IllegalStateException("Upgrades map is null in " + Upgrades.class.getSimpleName());
+            } catch (IllegalStateException e) {
+                return false;
+            }
+        }
         for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
             if (ItemStack.isSameItem(entry.getKey(), upgrade)) {  // Compare only items, ignoring count and other properties
                 return entry.getValue();
@@ -37,7 +44,14 @@ public class Upgrades {
         return false;
     }
 
-    public static void setUpgradeStatus(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade, boolean value) {
+    public static void setUpgradeStatus(Map<ItemStack, Boolean> upgradesMap, ItemStack upgrade, boolean value) {
+        if (upgradesMap == null) {
+            try {
+                throw new IllegalStateException("Upgrades map is null in " + Upgrades.class.getSimpleName());
+            } catch (IllegalStateException e) {
+                return;
+            }
+        }
         for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
             if (ItemStack.isSameItem(entry.getKey(), upgrade)) {  // Compare only items, ignoring count and other properties
                 entry.setValue(value);
@@ -47,7 +61,7 @@ public class Upgrades {
         throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
     }
 
-    public static void toggleUpgrade(Map<ItemStack,Boolean> upgradesMap,ItemStack upgrade) {
+    public static void toggleUpgrade(Map<ItemStack, Boolean> upgradesMap, ItemStack upgrade) {
         for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
             if (ItemStack.isSameItem(entry.getKey(), upgrade)) {
                 upgradesMap.put(entry.getKey(), !upgradesMap.get(entry.getKey()));
@@ -57,7 +71,7 @@ public class Upgrades {
         throw new IllegalArgumentException("Invalid upgrade: " + upgrade);
     }
 
-    public static void toggleUpgrades(Map<ItemStack,Boolean> upgradesMap,Map<ItemStack, Boolean> upgradesToToggle) {
+    public static void toggleUpgrades(Map<ItemStack, Boolean> upgradesMap, Map<ItemStack, Boolean> upgradesToToggle) {
         for (Map.Entry<ItemStack, Boolean> entry : upgradesToToggle.entrySet()) {
             if (upgradesMap.containsKey(entry.getKey())) {
                 upgradesMap.put(entry.getKey(), entry.getValue());
