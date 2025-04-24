@@ -62,6 +62,13 @@ public class Upgrades {
     }
 
     public static void toggleUpgrade(Map<ItemStack, Boolean> upgradesMap, ItemStack upgrade) {
+        if (upgradesMap == null) {
+            try {
+                throw new IllegalStateException("Upgrades map is null in " + Upgrades.class.getSimpleName());
+            } catch (IllegalStateException e) {
+                return;
+            }
+        }
         for (Map.Entry<ItemStack, Boolean> entry : upgradesMap.entrySet()) {
             if (ItemStack.isSameItem(entry.getKey(), upgrade)) {
                 upgradesMap.put(entry.getKey(), !upgradesMap.get(entry.getKey()));
